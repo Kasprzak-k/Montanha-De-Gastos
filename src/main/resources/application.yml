@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: montanha-de-gastos
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+
+simulacao:
+  taxas:
+    taxa-real-anual-padrao: 0.04
+    cache-ttl: 24h
+
