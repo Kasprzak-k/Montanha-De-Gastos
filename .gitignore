@@ -36,3 +36,7 @@ build/
 ### VS Code ###
 .vscode/
 
+# Skills e cache local de ferramentas
+.taste-skill/
+
+

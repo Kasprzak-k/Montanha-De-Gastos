@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-type="software" data-radius="sharp" data-buttons="solid" data-motion>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="page-type" content="software">
+  <meta name="site-kind" content="software">
+  <meta name="theme-color" content="#F5F3EE">
+  <meta name="description" content="Simulador financeiro 3D que compara o custo acumulado de um hábito recorrente com o montante investido acima da inflação pelo CDI e IPCA do Banco Central.">
+  <title>Montanha de Gastos — Simulador de Hábitos em Juros Reais</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <header class="nav" role="banner">
+    <div class="wrap nav__inner">
+      <a class="skip-link" href="#top">Pular para o simulador</a>
+      <a class="brand" href="#top" aria-label="Montanha de Gastos — Início">
+        <span class="brand__mark" aria-hidden="true">
+          <span class="brand__bar brand__bar--left"></span>
+          <span class="brand__bar brand__bar--right"></span>
+        </span>
+        <span class="brand__name">Montanha de Gastos</span>
+      </a>
+
+      <div class="nav__meta">
+        <span id="taxa-badge" class="rate-pill" aria-live="polite">
+          <span class="rate-pill__dot" aria-hidden="true"></span>
+          <span id="taxa-texto">Carregando taxa real (BCB SGS)…</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="section workbench" data-enter aria-labelledby="titulo-simulador">
+      <div class="wrap workbench__inner">
+        <div class="workbench__header">
+          <h1 id="titulo-simulador" class="workbench__title">
+            Simulador de custo de hábitos em juros reais.
+            <span class="muted">Compare o volume desperdiçado com os maços de R$ 10.000 acumulados.</span>
+          </h1>
+        </div>
+
+        <div class="scoreboards" role="region" aria-label="Placares da simulação">
+          <article class="scoreboard scoreboard--waste">
+            <div class="scoreboard__top">
+              <span class="scoreboard__label">Custo bruto desperdiçado</span>
+              <span id="escala-itens" class="scoreboard__scale" hidden>1 item 3D = 1 unidade</span>
+            </div>
+            <div class="scoreboard__main">
+              <strong id="valor-custo-bruto" class="scoreboard__value scoreboard__value--waste">R$ 87.600</strong>
+              <span id="contagem-itens" class="scoreboard__sub">10.950 cafés</span>
+            </div>
+          </article>
+
+          <article class="scoreboard scoreboard--invested">
+            <div class="scoreboard__top">
+              <span class="scoreboard__label">Montante investido (CDI descontado o IPCA)</span>
+              <span id="tag-multiplicador" class="badge-mult">1,9x maior</span>
+            </div>
+            <div class="scoreboard__main">
+              <strong id="valor-montante" class="scoreboard__value scoreboard__value--invested">R$ 166.746,89</strong>
+              <span id="contagem-macos" class="scoreboard__sub">16 maços de R$ 10.000</span>
+            </div>
+          </article>
+        </div>
+
+        <div class="stage-frame" data-visual>
+          <canvas
+            id="visualizer-canvas"
+            aria-label="Visualizador 3D interativo: à esquerda, a montanha de itens do hábito; à direita, a montanha de maços de R$ 10.000 em notas de R$ 100"
+          ></canvas>
+
+          <div class="stage-controls">
+            <button
+              type="button"
+              id="btn-camera-reset"
+              class="stage-btn"
+              aria-label="Redefinir enquadramento da câmera 3D"
+              title="Redefinir câmera"
+            >
+              Enquadrar
+            </button>
+            <button
+              type="button"
+              id="btn-camera-toggle"
+              class="stage-btn stage-btn--icon"
+              aria-pressed="false"
+              aria-label="Pausar rotação suave da câmera"
+              title="Pausar ou retomar giro"
+            >
+              <span id="icon-camera-toggle" aria-hidden="true">❚❚</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="controls-dock" role="form" aria-label="Parâmetros do hábito">
+          <div class="controls-grid">
+            <div class="control-group control-group--presets">
+              <span class="control-label" id="label-habito">Hábito</span>
+              <div id="preset-buttons" class="segmented segmented--presets" role="group" aria-labelledby="label-habito">
+                <button type="button" class="seg-btn is-active" data-habito="CAFE" aria-pressed="true">Café</button>
+                <button type="button" class="seg-btn" data-habito="DELIVERY" aria-pressed="false">Delivery</button>
+                <button type="button" class="seg-btn" data-habito="FUMO" aria-pressed="false">Fumo</button>
+                <button type="button" class="seg-btn" data-habito="COMPRAS" aria-pressed="false">Compras</button>
+              </div>
+            </div>
+
+            <div class="control-group control-group--valor">
+              <label class="control-label" for="input-valor">Valor unitário (R$)</label>
+              <div class="money-field">
+                <span class="money-field__prefix" aria-hidden="true">R$</span>
+                <input
+                  id="input-valor"
+                  class="money-field__input"
+                  type="number"
+                  min="0.01"
+                  max="1000000"
+                  step="0.50"
+                  value="8.00"
+                  inputmode="decimal"
+                  aria-describedby="erro-validacao"
+                >
+              </div>
+            </div>
+
+            <div class="control-group control-group--freq">
+              <span class="control-label" id="label-frequencia">Frequência</span>
+              <div id="freq-buttons" class="segmented" role="group" aria-labelledby="label-frequencia">
+                <button type="button" class="seg-btn is-active" data-frequencia="DIA" aria-pressed="true">Por dia</button>
+                <button type="button" class="seg-btn" data-frequencia="SEMANA" aria-pressed="false">Por semana</button>
+                <button type="button" class="seg-btn" data-frequencia="MES" aria-pressed="false">Por mês</button>
+              </div>
+            </div>
+
+            <div class="control-group control-group--anos">
+              <span class="control-label" id="label-horizonte">Horizonte</span>
+              <div id="anos-buttons" class="segmented" role="group" aria-labelledby="label-horizonte">
+                <button type="button" class="seg-btn" data-anos="10" aria-pressed="false">10 anos</button>
+                <button type="button" class="seg-btn" data-anos="20" aria-pressed="false">20 anos</button>
+                <button type="button" class="seg-btn is-active" data-anos="30" aria-pressed="true">30 anos</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="impact-bar">
+            <p id="frase-impacto" class="impact-bar__text" aria-live="polite">
+              Em 30 anos, seus 10.950 cafés custam R$ 87.600 e, investidos, virariam R$ 166.746,89.
+            </p>
+            <p id="erro-validacao" class="impact-bar__error" role="alert" hidden></p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
+

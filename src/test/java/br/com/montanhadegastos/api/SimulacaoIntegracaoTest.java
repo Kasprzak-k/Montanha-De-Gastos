@@ -17,7 +17,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -97,6 +99,14 @@ class SimulacaoIntegracaoTest {
                 .andExpect(jsonPath("$.montanteInvestido").value(166746.89))
                 .andExpect(jsonPath("$.taxaRealAnual").value(0.04))
                 .andExpect(jsonPath("$.origemTaxa").value("padrao"));
+    }
+
+    @Test
+    @DisplayName("Frontend estático: GET /index.html deve servir a interface do visualizador 3D")
+    void deveServirIndexHtmlDoVisualizer() throws Exception {
+        mockMvc.perform(get("/index.html"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("visualizer-canvas")));
     }
 }
 
