@@ -15,4 +15,26 @@ simulacao:
   taxas:
     taxa-real-anual-padrao: 0.04
     cache-ttl: 24h
+  habitos:
+    - id: CAFE
+      nome: Café
+      valor-padrao: 8.00
+      frequencia-padrao: DIA
+      rotulo-item: cafés
+    - id: DELIVERY
+      nome: Delivery
+      valor-padrao: 45.00
+      frequencia-padrao: SEMANA
+      rotulo-item: pedidos
+    - id: FUMO
+      nome: Fumo
+      valor-padrao: 12.00
+      frequencia-padrao: DIA
+      rotulo-item: maços de cigarro
+    - id: COMPRAS
+      nome: Compras
+      valor-padrao: 300.00
+      frequencia-padrao: MES
+      rotulo-item: compras
+
 
